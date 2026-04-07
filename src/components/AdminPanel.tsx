@@ -1,48 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Save, Plus, Trash2, LogOut } from 'lucide-react';
+import { Lock, Save, Plus, Trash2, LogOut, UploadCloud } from 'lucide-react';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { db, auth } from '../firebase';
 import { PortfolioData, Project } from '../types';
 import { initialData } from '../data';
 
 export default function AdminPanel() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
+  const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<PortfolioData>(initialData);
-  const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasLocalData, setHasLocalData] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('portfolio_data');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setData({ ...initialData, ...parsed });
+    // Check for local data that might need migration
+    const local = localStorage.getItem('portfolio_data');
+    if (local) setHasLocalData(true);
+
+    // Track auth state
+    const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+
+    // Load data from Firestore
+    const unsubscribeData = onSnapshot(doc(db, 'settings', 'portfolio'), (snapshot) => {
+      if (snapshot.exists()) {
+        setData(snapshot.data() as PortfolioData);
       }
-    } catch (e) {
-      console.error('Failed to load portfolio data:', e);
-      localStorage.removeItem('portfolio_data');
-    }
+    });
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeData();
+    };
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === '0925') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Invalid password');
+  const handleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      console.error('Login error:', err);
+      alert('로그인 중 오류가 발생했습니다.');
     }
   };
 
-  const handleSave = () => {
+  const handleLogout = () => signOut(auth);
+
+  const handleSave = async (dataToSave = data) => {
+    if (!user) return;
+    
+    setIsSaving(true);
     try {
-      localStorage.setItem('portfolio_data', JSON.stringify(data));
-      alert('Portfolio saved successfully!');
-      window.location.href = '/';
+      await setDoc(doc(db, 'settings', 'portfolio'), dataToSave);
+      alert('서버에 성공적으로 저장되었습니다!');
+      // Clear local data after successful migration if it was a migration
+      if (hasLocalData) {
+        localStorage.removeItem('portfolio_data');
+        setHasLocalData(false);
+      }
     } catch (err: any) {
       console.error('Save error:', err);
-      if (err.name === 'QuotaExceededError') {
-        alert('저장 공간이 부족합니다. 이미지 크기를 줄이거나 개수를 줄여주세요.');
-      } else {
-        alert('저장 중 오류가 발생했습니다.');
+      alert('저장 중 오류가 발생했습니다: ' + err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const migrateLocalData = () => {
+    const local = localStorage.getItem('portfolio_data');
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        const merged = { ...initialData, ...parsed };
+        setData(merged);
+        handleSave(merged);
+      } catch (e) {
+        console.error('Migration error:', e);
       }
     }
   };
@@ -83,7 +117,7 @@ export default function AdminPanel() {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6">
         <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
@@ -93,25 +127,31 @@ export default function AdminPanel() {
             </div>
           </div>
           <h2 className="text-2xl font-bold text-center mb-2 serif">Admin Access</h2>
-          <p className="text-slate-400 text-center mb-8 text-sm">Enter password to manage your portfolio</p>
+          <p className="text-slate-400 text-center mb-8 text-sm">Sign in with Google to manage your portfolio</p>
           
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-slate-900 outline-none transition-all"
-              autoFocus
-            />
-            {error && <p className="text-red-500 text-xs font-medium">{error}</p>}
-            <button
-              type="submit"
-              className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
-            >
-              Sign In
-            </button>
-          </form>
+          <button
+            onClick={handleLogin}
+            className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 flex items-center justify-center gap-3"
+          >
+            Google 로그인
+          </button>
+          
+          <p className="mt-6 text-[10px] text-slate-400 text-center uppercase tracking-widest">
+            Authorized: maxmin0925@gmail.com
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if the logged in user is the admin
+  if (user.email !== 'maxmin0925@gmail.com') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6">
+        <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl border border-slate-100 text-center">
+          <h2 className="text-xl font-bold mb-4">권한이 없습니다</h2>
+          <p className="text-slate-500 mb-8">이 계정({user.email})은 관리자 권한이 없습니다.</p>
+          <button onClick={handleLogout} className="text-slate-900 font-bold underline">다른 계정으로 로그인</button>
         </div>
       </div>
     );
@@ -126,31 +166,41 @@ export default function AdminPanel() {
             <p className="text-slate-500">Update your projects and information</p>
           </div>
           <div className="flex gap-4">
+            {hasLocalData && (
+              <button 
+                onClick={migrateLocalData}
+                className="flex items-center gap-2 px-6 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl border border-amber-100 hover:bg-amber-100 transition-all"
+                title="브라우저에 저장된 데이터를 서버로 업로드합니다"
+              >
+                <UploadCloud size={18} />
+                Local {'->'} Server
+              </button>
+            )}
             <button 
               onClick={() => {
-                if (window.confirm('모든 데이터를 초기 상태로 되돌리시겠습니까? (저장된 변경사항이 사라집니다)')) {
-                  localStorage.removeItem('portfolio_data');
-                  window.location.reload();
+                if (window.confirm('서버의 모든 데이터를 초기 상태로 되돌리시겠습니까?')) {
+                  handleSave(initialData);
                 }
               }}
               className="flex items-center gap-2 px-6 py-3 bg-white text-red-500 font-bold rounded-xl border border-red-100 hover:bg-red-50 transition-all"
             >
               <Trash2 size={18} />
-              Reset
+              Reset Server
             </button>
             <button 
-              onClick={() => setIsAuthenticated(false)}
+              onClick={handleLogout}
               className="flex items-center gap-2 px-6 py-3 bg-white text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all"
             >
               <LogOut size={18} />
               Logout
             </button>
             <button 
-              onClick={handleSave}
-              className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-all"
+              onClick={() => handleSave()}
+              disabled={isSaving}
+              className={`flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-all ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <Save size={18} />
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>

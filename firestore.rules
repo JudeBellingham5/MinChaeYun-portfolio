@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: settings
+    // Document: portfolio
+    // Fields: name, englishName, email, profileImage, birthDate, education, certifications, bioTitle, bioDescription, mainProjects, additionalWork, skills
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "maxmin0925@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    // Portfolio data is publicly readable but only admin can write
+    match /settings/portfolio {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "portfolio": {
+      "title": "Portfolio Data",
+      "description": "The main data for the portfolio, including profile info and projects.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "englishName": { "type": "string" },
+        "email": { "type": "string" },
+        "profileImage": { "type": "string" },
+        "birthDate": { "type": "string" },
+        "education": { "type": "array", "items": { "type": "string" } },
+        "certifications": { "type": "array", "items": { "type": "string" } },
+        "bioTitle": { "type": "string" },
+        "bioDescription": { "type": "string" },
+        "mainProjects": { "type": "array", "items": { "$ref": "project" } },
+        "additionalWork": { "type": "array", "items": { "$ref": "project" } },
+        "skills": { "type": "array", "items": { "$ref": "skill" } }
+      }
+    },
+    "project": {
+      "title": "Project",
+      "description": "A single project entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "oneLiner": { "type": "string" },
+        "period": { "type": "string" },
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "personnel": { "type": "string" },
+        "description": { "type": "string" },
+        "tasks": { "type": "array", "items": { "type": "string" } },
+        "highlights": { "type": "array", "items": { "type": "string" } },
+        "resultType": { "type": "string" },
+        "image": { "type": "string" },
+        "links": { "type": "object" }
+      }
+    },
+    "skill": {
+      "title": "Skill",
+      "description": "A skill category and its items.",
+      "type": "object",
+      "properties": {
+        "category": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "firestore": {
+    "/settings/portfolio": {
+      "schema": "portfolio",
+      "description": "The single document containing all portfolio data."
+    }
+  }
+}

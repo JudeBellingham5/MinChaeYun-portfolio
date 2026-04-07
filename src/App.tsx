@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Mail, ChevronRight, Database, BarChart3, Layout, MessageSquare, Calendar, GraduationCap, Award } from 'lucide-react';
+import { doc, onSnapshot, getDocFromServer } from 'firebase/firestore';
+import { db } from './firebase';
 import Navbar from './components/Navbar';
 import ProjectCard from './components/ProjectCard';
 import AdminPanel from './components/AdminPanel';
@@ -10,19 +12,48 @@ import { PortfolioData } from './types';
 
 function Portfolio() {
   const [data, setData] = useState<PortfolioData>(initialData);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('portfolio_data');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setData({ ...initialData, ...parsed });
+    // Test connection
+    const testConnection = async () => {
+      try {
+        await getDocFromServer(doc(db, 'settings', 'portfolio'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.error("Please check your Firebase configuration.");
+        }
       }
-    } catch (e) {
-      console.error('Failed to load portfolio data:', e);
-      localStorage.removeItem('portfolio_data'); // Clear corrupted data
-    }
+    };
+    testConnection();
+
+    // Listen for real-time updates from Firestore
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'portfolio'), (snapshot) => {
+      if (snapshot.exists()) {
+        setData(snapshot.data() as PortfolioData);
+      } else {
+        // If no data in Firestore, use initialData but don't overwrite Firestore yet
+        setData(initialData);
+      }
+      setIsLoading(false);
+    }, (error) => {
+      console.error('Firestore Error:', error);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-400 font-bold tracking-widest uppercase text-xs">Loading Portfolio...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
