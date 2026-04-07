@@ -1,8 +1,8 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React from 'react';
 import { AlertCircle } from 'lucide-react';
 
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -10,25 +10,32 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false, error: null };
+export default class ErrorBoundary extends React.Component<any, any> {
+  public state: any;
+  public props: any;
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): any {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("ErrorBoundary caught an error", error, errorInfo);
   }
 
   render() {
-    if (this.state.hasError) {
+    const { hasError, error } = (this as any).state;
+    if (hasError) {
       let errorMessage = "Something went wrong.";
       try {
-        const parsed = JSON.parse(this.state.error?.message || "");
+        const parsed = JSON.parse(error?.message || "");
         if (parsed.error) errorMessage = parsed.error;
       } catch (e) {
-        errorMessage = this.state.error?.message || errorMessage;
+        errorMessage = error?.message || errorMessage;
       }
 
       return (
@@ -50,6 +57,6 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
       );
     }
 
-    return this.props.children;
+    return (this as any).props.children;
   }
 }

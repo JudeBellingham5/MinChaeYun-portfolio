@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Lock, Save, Plus, Trash2, LogOut, UploadCloud } from 'lucide-react';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, User } from 'firebase/auth';
@@ -11,6 +12,7 @@ export default function AdminPanel() {
   const [data, setData] = useState<PortfolioData>(initialData);
   const [isSaving, setIsSaving] = useState(false);
   const [hasLocalData, setHasLocalData] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check for local data that might need migration
@@ -59,6 +61,8 @@ export default function AdminPanel() {
         localStorage.removeItem('portfolio_data');
         setHasLocalData(false);
       }
+      // Redirect to home to see the changes
+      navigate('/');
     } catch (err: any) {
       console.error('Save error:', err);
       alert('저장 중 오류가 발생했습니다: ' + err.message);
@@ -158,21 +162,21 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-24 px-6">
+    <div className="min-h-screen bg-slate-50 pt-24 md:pt-32 pb-24 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
-            <h1 className="text-4xl font-bold serif mb-2">Portfolio Manager</h1>
+            <h1 className="text-3xl md:text-4xl font-bold serif mb-2">Portfolio Manager</h1>
             <p className="text-slate-500">Update your projects and information</p>
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-3 w-full md:w-auto">
             {hasLocalData && (
               <button 
                 onClick={migrateLocalData}
-                className="flex items-center gap-2 px-6 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl border border-amber-100 hover:bg-amber-100 transition-all"
+                className="flex flex-1 md:flex-none items-center justify-center gap-2 px-4 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl border border-amber-100 hover:bg-amber-100 transition-all text-sm"
                 title="브라우저에 저장된 데이터를 서버로 업로드합니다"
               >
-                <UploadCloud size={18} />
+                <UploadCloud size={16} />
                 Local {'->'} Server
               </button>
             )}
@@ -182,24 +186,24 @@ export default function AdminPanel() {
                   handleSave(initialData);
                 }
               }}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-red-500 font-bold rounded-xl border border-red-100 hover:bg-red-50 transition-all"
+              className="flex flex-1 md:flex-none items-center justify-center gap-2 px-4 py-3 bg-white text-red-500 font-bold rounded-xl border border-red-100 hover:bg-red-50 transition-all text-sm"
             >
-              <Trash2 size={18} />
-              Reset Server
+              <Trash2 size={16} />
+              Reset
             </button>
             <button 
               onClick={handleLogout}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all"
+              className="flex flex-1 md:flex-none items-center justify-center gap-2 px-4 py-3 bg-white text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all text-sm"
             >
-              <LogOut size={18} />
+              <LogOut size={16} />
               Logout
             </button>
             <button 
               onClick={() => handleSave()}
               disabled={isSaving}
-              className={`flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-all ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex flex-1 md:flex-none items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-all text-sm ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              <Save size={18} />
+              <Save size={16} />
               {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>

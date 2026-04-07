@@ -59,7 +59,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           {project.title}
         </h3>
         
-        <div className="grid grid-cols-2 gap-y-3 mb-6 border-y border-slate-50 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 mb-6 border-y border-slate-50 py-4">
           <div>
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">작업 기간</p>
             <p className="text-[11px] font-bold text-slate-900">{project.period || '-'}</p>
