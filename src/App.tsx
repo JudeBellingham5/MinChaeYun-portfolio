@@ -60,38 +60,38 @@ function Portfolio() {
       <Navbar />
       
       {/* Home Section */}
-      <section id="home" className="min-h-screen flex flex-col justify-center section-padding relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50 -z-10 skew-x-12 translate-x-24" />
+      <section id="home" className="min-h-screen flex flex-col justify-center section-padding relative overflow-hidden pt-32 md:pt-0">
+        <div className="absolute top-0 right-0 w-full md:w-1/2 h-full bg-slate-50 -z-10 skew-x-0 md:skew-x-12 translate-x-0 md:translate-x-24 opacity-50 md:opacity-100" />
         
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl"
+          className="max-w-4xl relative z-10"
         >
-          <p className="text-xs font-bold tracking-[0.4em] text-slate-400 uppercase mb-6">
+          <p className="text-[10px] md:text-xs font-bold tracking-[0.4em] text-slate-400 uppercase mb-4 md:mb-6">
             {data.englishName}
           </p>
-          <h1 className="text-5xl md:text-8xl font-bold leading-[1.1] mb-8 serif">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6 md:mb-8 serif break-keep">
             데이터로 해석하고, <br />
             <span className="text-slate-400 italic">전략으로 연결합니다.</span>
           </h1>
-          <p className="text-lg text-slate-500 max-w-2xl mb-12 leading-relaxed">
-            데이터 수집부터 분석, 시각화, 그리고 실행 가능한 전략 도출까지. <br />
+          <p className="text-base md:text-lg text-slate-500 max-w-2xl mb-8 md:mb-12 leading-relaxed break-keep">
+            데이터 수집부터 분석, 시각화, 그리고 실행 가능한 전략 도출까지. <br className="hidden md:block" />
             저는 <span className="text-slate-900 font-bold">데이터</span>를 통해 문제를 구조적으로 해석하고 <span className="text-slate-900 font-bold">성과</span>로 연결하는 <span className="text-slate-900 font-bold">민채윤</span>입니다.
           </p>
           
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             <a 
               href="#projects" 
-              className="px-8 py-4 bg-slate-900 text-white font-bold rounded-full flex items-center gap-3 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
+              className="px-8 py-4 bg-slate-900 text-white font-bold rounded-full flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group text-sm md:text-base"
             >
               프로젝트 보기
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a 
               href="#contact" 
-              className="px-8 py-4 bg-white text-slate-900 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all"
+              className="px-8 py-4 bg-white text-slate-900 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all text-center text-sm md:text-base"
             >
               연락하기
             </a>
@@ -101,7 +101,7 @@ function Portfolio() {
 
       {/* About Section */}
       <section id="about" className="section-padding bg-slate-50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-24 items-start">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -122,8 +122,8 @@ function Portfolio() {
                 </div>
               )}
             </div>
-            <div className="absolute -bottom-12 -right-12 w-80 md:w-96 bg-white p-8 rounded-3xl shadow-xl hidden md:block border border-slate-100">
-              <div className="space-y-6">
+            <div className="static md:absolute md:-bottom-12 md:-right-12 w-full md:w-80 lg:w-96 bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 mt-6 md:mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-6">
                 <div className="flex items-start gap-4">
                   <div className="p-2.5 bg-slate-50 rounded-xl text-slate-400 shrink-0">
                     <Calendar size={18} />
@@ -152,12 +152,12 @@ function Portfolio() {
 
           <div className="pt-12 lg:pt-0">
             <h2 className="text-xs font-bold tracking-[0.4em] text-slate-400 uppercase mb-6">About Me</h2>
-            <h3 className="text-4xl font-bold mb-8 serif leading-tight whitespace-pre-line break-keep">
-              {data.bioTitle}
-            </h3>
-            <p className="text-slate-600 text-lg mb-12 leading-relaxed break-keep">
-              {data.bioDescription}
-            </p>
+          <h3 className="text-4xl font-bold mb-8 serif leading-tight whitespace-pre-line break-keep">
+            {data.bioTitle}
+          </h3>
+          <p className="text-slate-600 text-lg mb-12 leading-relaxed break-keep">
+            {data.bioDescription}
+          </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="space-y-6">
@@ -203,9 +203,9 @@ function Portfolio() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div>
               <h2 className="text-xs font-bold tracking-[0.4em] text-slate-400 uppercase mb-6">Main Projects</h2>
-              <h3 className="text-4xl font-bold serif">프로젝트 목록</h3>
+              <h3 className="text-4xl font-bold serif break-keep">프로젝트 목록</h3>
             </div>
-            <p className="text-slate-400 max-w-md text-sm">
+            <p className="text-slate-400 max-w-md text-sm break-keep">
               데이터를 기반으로 마케팅 문제를 구조적으로 해석하고, 
               실제 실행 가능한 전략으로 연결한 주요 프로젝트들입니다.
             </p>
@@ -222,16 +222,16 @@ function Portfolio() {
       {/* Additional Work */}
       <section className="section-padding bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-16">
+          <div className="mb-12 md:mb-16">
             <h2 className="text-xs font-bold tracking-[0.4em] text-slate-500 uppercase mb-6">Additional Work</h2>
-            <h3 className="text-4xl font-bold serif">구현과 실행의 경험</h3>
+            <h3 className="text-3xl md:text-4xl font-bold serif">구현과 실행의 경험</h3>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+ 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-stretch">
             {data.additionalWork.map((project, index) => (
-              <div key={project.id} className="group relative bg-white/5 border border-white/10 p-10 rounded-3xl hover:bg-white/10 transition-all duration-500">
-                <div className="flex flex-col md:flex-row gap-10">
-                  <div className="w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden">
+              <div key={project.id} className="group relative bg-white/5 border border-white/10 p-6 md:p-10 rounded-3xl hover:bg-white/10 transition-all duration-500">
+                <div className="flex flex-col md:flex-row gap-8 md:gap-10 h-full">
+                  <div className="w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden shrink-0">
                     {project.image ? (
                       <img 
                         src={project.image} 
@@ -247,9 +247,9 @@ function Portfolio() {
                   </div>
                   <div className="w-full md:w-1/2 flex flex-col justify-center">
                     <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-4">{project.category}</p>
-                    <h4 className="text-2xl font-bold mb-4 serif break-keep">{project.title}</h4>
+                    <h4 className="text-xl md:text-2xl font-bold mb-4 serif break-keep">{project.title}</h4>
                     
-                    <div className="flex flex-wrap gap-x-6 gap-y-2 mb-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 mb-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                       <div className="flex items-center gap-2">
                         <span className="text-slate-600">Period:</span>
                         <span className="text-slate-300">{project.period || '-'}</span>
@@ -263,9 +263,9 @@ function Portfolio() {
                         <span className="text-slate-300">{project.tools?.join(', ') || '-'}</span>
                       </div>
                     </div>
-
+ 
                     <p className="text-slate-400 text-sm mb-8 leading-relaxed whitespace-pre-line break-keep">{project.oneLiner}</p>
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 mt-auto">
                       {project.links?.site && (
                         <a 
                           href={project.links.site} 
@@ -337,23 +337,23 @@ function Portfolio() {
       <section id="contact" className="section-padding bg-slate-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-xs font-bold tracking-[0.4em] text-slate-400 uppercase mb-6">Get In Touch</h2>
-          <h3 className="text-4xl md:text-5xl font-bold mb-12 serif leading-tight">
-            데이터와 마케팅의 연결고리를 <br />
+          <h3 className="text-3xl md:text-5xl font-bold mb-8 md:mb-12 serif leading-tight break-keep px-4">
+            데이터와 마케팅의 연결고리를 <br className="hidden md:block" />
             함께 만들어가고 싶습니다.
           </h3>
-          <p className="text-slate-500 mb-12 text-lg">
-            프로젝트와 포트폴리오에 대해 더 이야기하고 싶다면 <br />
+          <p className="text-slate-500 mb-12 text-base md:text-lg break-keep px-4">
+            프로젝트와 포트폴리오에 대해 더 이야기하고 싶다면 <br className="hidden md:block" />
             아래 메일로 언제든 연락 부탁드립니다.
           </p>
           
-          <div className="inline-flex flex-col items-center">
+          <div className="inline-flex flex-col items-center px-4">
             <a 
               href={`mailto:${data.email}`}
-              className="text-2xl md:text-3xl font-bold text-slate-900 hover:text-slate-600 transition-colors mb-4 border-b-2 border-slate-900 pb-2"
+              className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 hover:text-slate-600 transition-colors mb-4 border-b-2 border-slate-900 pb-2 break-all"
             >
               {data.email}
             </a>
-            <p className="text-xs font-bold tracking-[0.2em] text-slate-400 uppercase">
+            <p className="text-[10px] md:text-xs font-bold tracking-[0.2em] text-slate-400 uppercase">
               {data.name} | {data.englishName}
             </p>
           </div>
